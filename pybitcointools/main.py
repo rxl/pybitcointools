@@ -68,7 +68,7 @@ def base10_add(a,b):
     else: return (0,0)
   m = ((b[1]-a[1]) * inv(b[0]-a[0],P)) % P
   x = (m*m-a[0]-b[0]) % P
-  y = (m*(a[0]-x)-a[1]) % P
+  y = (m*(a[0]-x)-a[1]) % Pe
   return (x,y)
   
 def base10_double(a):
@@ -131,16 +131,16 @@ def get_privkey_format(priv):
         elif len(bin_p) == 33: return 'wif_compressed'
         else: raise Exception("WIF does not represent privkey")
 
-def encode_privkey(priv,formt):
+def encode_privkey(priv,formt,magicbyte=0):
     if not isinstance(priv,(int,long)):
-        return encode_privkey(decode_privkey(priv),formt)
+        return encode_privkey(decode_privkey(priv),formt, magicbyte=128+magicbyte)
     if formt == 'decimal': return priv
     elif formt == 'bin': return encode(priv,256,32)
     elif formt == 'bin_compressed': return encode(priv,256,32)+'\x01'
     elif formt == 'hex': return encode(priv,16,64)
     elif formt == 'hex_compressed': return encode(priv,16,64)+'01'
-    elif formt == 'wif': return bin_to_b58check(encode(priv,256,32),128)
-    elif formt == 'wif_compressed': return bin_to_b58check(encode(priv,256,32)+'\x01',128)
+    elif formt == 'wif': return bin_to_b58check(encode(priv,256,32),128+magicbyte)
+    elif formt == 'wif_compressed': return bin_to_b58check(encode(priv,256,32)+'\x01',128+magicbyte)
     else: raise Exception("Invalid format!")
 
 def decode_privkey(priv,formt=None):
